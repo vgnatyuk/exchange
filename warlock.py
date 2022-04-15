@@ -9,7 +9,7 @@ def c3_logger(func):
         return_value = {"INIT_ERROR": "Haven't C3 API instance"}
         if hasattr(warlock_instance, "c3"):
             return_value = func(*args, **kwargs)
-        log_result(return_value, func.__name__)
+        log_result(return_value, func.__name__, *args, **kwargs)
 
     return wrapper
 
@@ -20,17 +20,17 @@ def coinsbit_logger(func):
         return_value = {"INIT_ERROR": "Haven't COINSBIT API instance"}
         if hasattr(warlock_instance, "coinsbit"):
             return_value = func(*args, **kwargs)
-        log_result(return_value, func.__name__)
+        log_result(return_value, func.__name__, *args, **kwargs)
 
     return wrapper
 
 
-def log_result(result, file_name, **kwargs):
+def log_result(result, file_name, *args, **kwargs):
     if isinstance(result, bytes):
         result = result.decode()
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(f"{file_name}.json", "a", encoding="utf-8") as file:
-        file.write(f"[{now}] {result} {kwargs}\n")
+        file.write(f"[{now}] {result} {args} {kwargs}\n")
 
 
 class Warlock:
@@ -130,7 +130,7 @@ if __name__ == '__main__':
     coinsbit_config = CoinsbitConfig()
     warlock = Warlock(coinsbit=CoinsbitAPI, coinsbit_config=coinsbit_config)
     warlock.coinsbit_get_tickers()
-    warlock.coinsbit_get_current_order_book(coinsbit_config.TICKERS, side="BNB_USDT", offset=0, limit=20)
+    warlock.coinsbit_get_current_order_book(coinsbit_config.TICKERS, side="sell", offset=0, limit=20)
 
     orderData = {
         "direction": "sell",

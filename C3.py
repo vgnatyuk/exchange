@@ -501,7 +501,7 @@ class CoinsbitAPI:
         currency_pair = self.get_currency_pair(tickers)
         request_data = {
             "market": currency_pair,  # //ETH_BTC, BTC-ETH ...etc
-            "side": side,  # //or buy
+            "side": side,  # //sell or buy
             "offset": offset,  # //optional; default value 0
             "limit": limit,  # //optional; default value = 50
         }
