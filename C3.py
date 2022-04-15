@@ -15,6 +15,9 @@ class Config:
     C3_PR_KEY = "JnNw3Wnx5QIBfjHSksYVFXEsbulcBO2uOJQln3woDGsizvervidJNk3gXE2rqzEUyNgCzg"
     C3_PUB_KEY = "QWn55oJdZofjXUv4JKN9LKarNkahzLqq84Nt_g"
 
+    def __init__(self, tickers: list = None):
+        self.TICKERS = tickers or ["DEL", "USDT"]
+
 
 class C3_API:
     def __init__(self, prKey: str, pubKey: str) -> None:
@@ -281,12 +284,12 @@ class C3_API:
 
         return orderPlaceResult
 
-    def cancelOrder(self, tickers: list, order_giud: str) -> None:
+    def cancelOrder(self, tickers: list, order_guid: str):
         tickers = [ticker.upper() for ticker in tickers]
         currencyPairCode = tickers[0] + "_" + tickers[1]
 
         # Generate msg to sign
-        requestUrl = self.BASE_URL + self.CANCEL_ORDER_ENDPOINT + order_giud
+        requestUrl = self.BASE_URL + self.CANCEL_ORDER_ENDPOINT + order_guid
 
         # Generate msg to sign
         msg = self.pubKey + requestUrl
@@ -312,14 +315,15 @@ class C3_API:
 
 
 class CoinsbitConfig:
-    # API_KEY = "0fcfad9435f7b81261d1eea1ee3bde23"
-    # SECRET_API = "0c96af3654655a667c5f82f7d77b4098"
-    API_KEY = "a58369c8d86ca9d6b96f192a0016b9bc"
-    SECRET_API = "be6e4a9feb06fa5f60dd27dffb6878c6"
+    API_KEY = "0fcfad9435f7b81261d1eea1ee3bde23"
+    SECRET_API = "0c96af3654655a667c5f82f7d77b4098"
     WEBSOCKET_TOKEN = "$2y$10$XrSTDj2Al5q1Hu6k61SCP.LJRLLWHqGQM/zOkIFwzlPu0R6C.Yf0O"
 
+    def __init__(self, tickers: list = None):
+        self.TICKERS = tickers or ["BNB", "USDT"]
 
-class Coinsbit:
+
+class CoinsbitAPI:
     """for post methods needs headers
     {
         'X-TXC-APIKEY': self.api_key,
@@ -387,20 +391,19 @@ class Coinsbit:
         self.headers["X-TXC-SIGNATURE"] = signature
 
     @staticmethod
-    def get_currency_pair(currency_from: str, currency_to: str) -> str:
-        return f"{currency_from.upper()}_{currency_to.upper()}"
+    def get_currency_pair(tickers: list) -> str:
+        return f"{tickers[0].upper()}_{tickers[1].upper()}"
 
     def get_current_orders(
             self,
-            currency_from: str,
-            currency_to: str,
+            tickers: list,
             offset: int,
             limit: int,
     ):
         url = self.BASE_URL + self.ORDERS_IN_MARKET_ENDPOINT
         request_data = {
             "request": self.ORDERS_IN_MARKET_ENDPOINT,
-            "market": self.get_currency_pair(currency_from, currency_to),
+            "market": self.get_currency_pair(tickers),
             "offset": offset,
             "limit": limit,
             "nonce": int(time.time())
@@ -409,21 +412,19 @@ class Coinsbit:
         response = requests.post(url, headers=self.headers, json=request_data)
         return response.content
 
-
     def get_orders_history(
             self,
-            currency_from: str,
-            currency_to: str,
+            tickers: list,
             offset: int,
             limit: int,
     ):
         url = self.BASE_URL + self.ORDERS_HISTORY_ENDPOINT
         request_data = {
-              "request": self.ORDERS_HISTORY_ENDPOINT,
-              "market": self.get_currency_pair(currency_from, currency_to),
-              "offset": offset,
-              "limit": limit,
-              "nonce": int(time.time())
+            "request": self.ORDERS_HISTORY_ENDPOINT,
+            "market": self.get_currency_pair(tickers),
+            "offset": offset,
+            "limit": limit,
+            "nonce": int(time.time())
         }
         self.set_authorization_headers(request_data)
 
@@ -450,13 +451,12 @@ class Coinsbit:
 
     def place_order(
             self,
-            currency_from: str,
-            currency_to: str,
+            tickers: list,
             side: str,
             amount: float,
             price: float,
     ):
-        currency_pair = self.get_currency_pair(currency_from, currency_to)
+        currency_pair = self.get_currency_pair(tickers)
         url = self.BASE_URL + self.PLACE_ORDER_ENDPOINT
         request_data = {
             "market": currency_pair,
@@ -471,12 +471,11 @@ class Coinsbit:
 
     def cancel_order(
             self,
-            currency_from: str,
-            currency_to: str,
+            tickers: list,
             order_id: int,
     ):
         url = self.BASE_URL + self.CANCEL_ORDER_ENDPOINT
-        currency_pair = self.get_currency_pair(currency_from, currency_to)
+        currency_pair = self.get_currency_pair(tickers)
         request_data = {
             "market": currency_pair,
             "orderId": order_id,
@@ -493,14 +492,13 @@ class Coinsbit:
 
     def get_current_order_book(
             self,
-            currency_from: str,
-            currency_to: str,
+            tickers: list,
             side: str,
             offset: int,
             limit: int,
     ):
         url = self.BASE_URL + self.CURRENT_ORDER_BOOK_ENDPOINT
-        currency_pair = self.get_currency_pair(currency_from, currency_to)
+        currency_pair = self.get_currency_pair(tickers)
         request_data = {
             "market": currency_pair,  # //ETH_BTC, BTC-ETH ...etc
             "side": side,  # //or buy
