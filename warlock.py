@@ -130,15 +130,16 @@ if __name__ == '__main__':
     coinsbit_config = CoinsbitConfig()
     warlock = Warlock(coinsbit=CoinsbitAPI, coinsbit_config=coinsbit_config)
     warlock.coinsbit_get_tickers()
-    warlock.coinsbit_get_current_order_book(coinsbit_config.TICKERS, side="sell", offset=0, limit=20)
+    # warlock.coinsbit_get_current_order_book(coinsbit_config.TICKERS, side="sell", offset=0, limit=20)
+    warlock.coinsbit_place_order(coinsbit_config.TICKERS, side="sell", amount=1, price=12.5)
 
-    orderData = {
-        "direction": "sell",
-        "volume": 1,
-        "price": 10,
-    }
-    c3_config = Config()
-    warlock = Warlock(C3_API, c3_config)
-    warlock.c3_placeOrder(c3_config.TICKERS, orderData)
-    warlock.c3_getCurrentBalances(c3_config.TICKERS)
-    warlock.c3_getLastPrice(c3_config.TICKERS)
+    # orderData = {
+    #     "direction": "sell",
+    #     "volume": 1,
+    #     "price": 10,
+    # }
+    # c3_config = Config()
+    # warlock = Warlock(C3_API, c3_config)
+    # warlock.c3_placeOrder(c3_config.TICKERS, orderData)
+    # warlock.c3_getCurrentBalances(c3_config.TICKERS)
+    # warlock.c3_getLastPrice(c3_config.TICKERS)

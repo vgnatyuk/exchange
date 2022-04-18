@@ -377,7 +377,7 @@ class CoinsbitAPI:
 
     @staticmethod
     def get_payload(request_data):
-        return base64.b64encode(json.dumps(request_data).encode())
+        return base64.b64encode(json.dumps(request_data, separators=(',', ':')).encode())
 
     def get_signature(self, payload):
         return hmac.new(
@@ -459,10 +459,12 @@ class CoinsbitAPI:
         currency_pair = self.get_currency_pair(tickers)
         url = self.BASE_URL + self.PLACE_ORDER_ENDPOINT
         request_data = {
+            "request": self.PLACE_ORDER_ENDPOINT,
             "market": currency_pair,
             "side": side,
             "amount": amount,
             "price": price,
+            "nonce": int(time.time())
         }
         self.set_authorization_headers(request_data)
         response = requests.post(url, headers=self.headers, json=request_data).content
@@ -506,3 +508,15 @@ class CoinsbitAPI:
             "limit": limit,  # //optional; default value = 50
         }
         return requests.get(url, json=request_data).content
+
+
+if __name__ == '__main__':
+    config = CoinsbitConfig()
+    coinsbit = CoinsbitAPI(config.API_KEY, config.SECRET_API, config.WEBSOCKET_TOKEN)
+    order_data = {
+        "tickers": ["btc", "eth"],
+        "side": "sell",
+        "amount": 1,
+        "price": 12.5,
+    }
+    coinsbit.place_order(**order_data)
