@@ -14,6 +14,8 @@ from config import KICKEX_PUB_KEY, KICKEX_PR_KEY, KICKEX_PASSWORD
 
 
 class Kickex(API):
+    """wrapper for kickex.com exchange api"""
+
     ORDER_STATUSES = {
         1: 'pending',  # 1 отложенный по каким - то причинам ордер
         2: 'on hold',  # 2 состояние торгового ордера после подтверждения сервисом SOB тогда
